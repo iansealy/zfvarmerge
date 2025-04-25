@@ -9,6 +9,11 @@
                         "branch": "master",
                         "git_sha": "f80914f78fb7fa1c00b14cfeb29575ee12240d9c",
                         "installed_by": ["modules"]
+                    },
+                    "samtools/faidx": {
+                        "branch": "master",
+                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "installed_by": ["modules"]
                     }
                 }
             },
