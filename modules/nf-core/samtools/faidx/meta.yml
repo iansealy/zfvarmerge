@@ -1,10 +1,9 @@
 name: samtools_faidx
-description: Index FASTA file, and optionally generate a file of chromosome sizes
+description: Index FASTA file
 keywords:
   - index
   - fasta
   - faidx
-  - chromosome
 tools:
   - samtools:
       description: |
@@ -35,10 +34,6 @@ input:
         type: file
         description: FASTA index file
         pattern: "*.{fai}"
-  - - get_sizes:
-        type: boolean
-        description: use cut to get the sizes of the index (true) or not (false)
-
 output:
   - fa:
       - meta:
@@ -60,16 +55,6 @@ output:
           type: file
           description: FASTA index file
           pattern: "*.{fai}"
-  - sizes:
-      - meta:
-          type: map
-          description: |
-            Groovy Map containing sample information
-            e.g. [ id:'test', single_end:false ]
-      - "*.sizes":
-          type: file
-          description: File containing chromosome lengths
-          pattern: "*.{sizes}"
   - gzi:
       - meta:
           type: map
@@ -90,5 +75,6 @@ authors:
   - "@ewels"
   - "@phue"
 maintainers:
-  - "@maxulysse"
+  - "@drpatelh"
+  - "@ewels"
   - "@phue"
