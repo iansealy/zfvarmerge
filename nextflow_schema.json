@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "outdir", "fasta"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -33,6 +33,51 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "common_options": {
+            "title": "Common options",
+            "type": "object",
+            "fa_icon": "fas fa-user-cog",
+            "description": "Most common options used for the pipeline.",
+            "properties": {
+                "fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?$",
+                    "description": "Path to FASTA genome file.",
+                    "help_text": "This parameter is *mandatory*.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "fasta_fai": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?.fai$",
+                    "description": "Path to FASTA FAI genome index file.",
+                    "help_text": "If this parameter is not specified then the index will be generated automatically.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "fasta_dict": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.dict$",
+                    "description": "Path to FASTA dictionary genome index file.",
+                    "help_text": "If this parameter is not specified then the index will be generated automatically.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "split_genome": {
+                    "type": "integer",
+                    "minimum": 100000,
+                    "default": 30000000,
+                    "description": "Specify the target number of base pairs each variant calling interval should contain.",
+                    "fa_icon": "fas fa-hand-scissors"
                 }
             }
         },
@@ -144,6 +189,18 @@
                     "type": "string",
                     "description": "Custom MultiQC yaml file containing HTML including a methods description.",
                     "fa_icon": "fas fa-cog"
+                },
+                "multiqc_replace_names": {
+                    "format": "file-path",
+                    "description": "Two-column sample renaming file to supply to MultiQC.",
+                    "fa_icon": "fas fa-cog",
+                    "hidden": true
+                },
+                "multiqc_sample_names": {
+                    "format": "file-path",
+                    "description": "TSV file with headers to supply to MultiQC.",
+                    "fa_icon": "fas fa-cog",
+                    "hidden": true
                 },
                 "validate_params": {
                     "type": "boolean",

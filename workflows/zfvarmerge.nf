@@ -18,7 +18,12 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_zfva
 workflow ZFVARMERGE {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+    ch_samplesheet        // channel: samplesheet read in from --input
+    ch_fasta              // channel: [ val(meta), [ fasta ] ]
+    ch_fasta_fai          // channel: [ val(meta), [ fai ] ]
+    ch_fasta_dict         // channel: [ val(meta), [ dict ] ]
+    ch_genome_bed         // channel: [ val(meta), [ bed ] ]
+
     main:
 
     ch_versions = Channel.empty()
@@ -47,6 +52,12 @@ workflow ZFVARMERGE {
     ch_multiqc_logo          = params.multiqc_logo ?
         Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
         Channel.empty()
+    ch_multiqc_replace_names = params.multiqc_replace_names ?
+        Channel.fromPath(params.multiqc_replace_names, checkIfExists: true) :
+        Channel.empty()
+    ch_multiqc_sample_names  = params.multiqc_sample_names ?
+        Channel.fromPath(params.multiqc_sample_names, checkIfExists: true) :
+        Channel.empty()
 
     summary_params      = paramsSummaryMap(
         workflow, parameters_schema: "nextflow_schema.json")
@@ -72,8 +83,8 @@ workflow ZFVARMERGE {
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
         ch_multiqc_logo.toList(),
-        [],
-        []
+        ch_multiqc_replace_names.toList(),
+        ch_multiqc_sample_names.toList()
     )
 
     emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
