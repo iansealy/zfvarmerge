@@ -3,6 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -30,6 +31,14 @@ workflow ZFVARMERGE {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+
+    //
+    // MODULE: BCFtools index
+    //
+    BCFTOOLS_INDEX (
+        ch_gatk_vcf
+    )
+    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
 
     //
     // Collate and save software versions
