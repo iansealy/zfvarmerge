@@ -73,7 +73,6 @@ workflow PIPELINE_INITIALISATION {
             validateInputSamplesheet(samplesheet)
         }
         .set { ch_samplesheet }
-    ch_samplesheet.view()
 
     emit:
     samplesheet = ch_samplesheet
