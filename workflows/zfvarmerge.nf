@@ -18,7 +18,9 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_zfva
 workflow ZFVARMERGE {
 
     take:
-    ch_samplesheet        // channel: samplesheet read in from --input
+    ch_gatk_vcf           // channel: samplesheet read in from --input
+    ch_freebayes_vcf      // channel: samplesheet read in from --input
+    ch_bcftools_vcf       // channel: samplesheet read in from --input
     ch_fasta              // channel: [ val(meta), [ fasta ] ]
     ch_fasta_fai          // channel: [ val(meta), [ fai ] ]
     ch_fasta_dict         // channel: [ val(meta), [ dict ] ]

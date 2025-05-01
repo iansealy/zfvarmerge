@@ -29,7 +29,9 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_zfva
 workflow IANSEALY_ZFVARMERGE {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    gatk_vcf      // channel: samplesheet read in from --input
+    freebayes_vcf // channel: samplesheet read in from --input
+    bcftools_vcf  // channel: samplesheet read in from --input
 
     main:
 
@@ -52,7 +54,9 @@ workflow IANSEALY_ZFVARMERGE {
     // WORKFLOW: Run pipeline
     //
     ZFVARMERGE (
-        samplesheet,
+        gatk_vcf,
+        freebayes_vcf,
+        bcftools_vcf,
         PREPARE_GENOME.out.fasta,
         fasta_fai,
         fasta_dict,
@@ -86,7 +90,9 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     IANSEALY_ZFVARMERGE (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.gatk_vcf,
+        PIPELINE_INITIALISATION.out.freebayes_vcf,
+        PIPELINE_INITIALISATION.out.bcftools_vcf
     )
     //
     // SUBWORKFLOW: Run completion tasks

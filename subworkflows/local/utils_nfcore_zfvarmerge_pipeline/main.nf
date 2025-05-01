@@ -72,11 +72,18 @@ workflow PIPELINE_INITIALISATION {
         .map { samplesheet ->
             validateInputSamplesheet(samplesheet)
         }
+        .multiMap { m, g, f, b ->
+            gatk:      [ m, g ]
+            freebayes: [ m, f ]
+            bcftools:  [ m, b ]
+        }
         .set { ch_samplesheet }
 
     emit:
-    samplesheet = ch_samplesheet
-    versions    = ch_versions
+    gatk_vcf      = ch_samplesheet.gatk
+    freebayes_vcf = ch_samplesheet.freebayes
+    bcftools_vcf  = ch_samplesheet.bcftools
+    versions      = ch_versions
 }
 
 /*
