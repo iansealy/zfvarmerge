@@ -78,6 +78,14 @@
                     "default": 30000000,
                     "description": "Specify the target number of base pairs each variant calling interval should contain.",
                     "fa_icon": "fas fa-hand-scissors"
+                },
+                "genomicsdb": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "description": "Directory containing GenomicsDB directories.",
+                    "help_text": "If this parameter is not specified then a new GenomicsDB will be created in the output directory.",
+                    "fa_icon": "fas fa-folder-open"
                 }
             }
         },

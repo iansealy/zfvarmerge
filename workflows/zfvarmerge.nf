@@ -3,6 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { GATK4_GENOMICSDBIMPORT } from '../modules/nf-core/gatk4/genomicsdbimport/main'
 include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
@@ -39,6 +40,25 @@ workflow ZFVARMERGE {
         ch_gatk_vcf
     )
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
+
+    ch_gatk_vcf_tbi = ch_gatk_vcf.join(BCFTOOLS_INDEX.out.tbi, failOnDuplicate: true, failOnMismatch: true)
+    ch_gatk_vcfs = []
+    ch_gatk_vcf_tbi.collect {it[1]}.subscribe(onNext: { it -> ch_gatk_vcfs = it })
+    ch_gatk_tbis = []
+    ch_gatk_vcf_tbi.collect {it[2]}.subscribe(onNext: { it -> ch_gatk_tbis = it })
+    ch_genomicsdbimport_input = ch_genome_bed
+        .map{ interval -> [ [ id:'genomicsdb', order:interval[1].baseName ], ch_gatk_vcfs, ch_gatk_tbis, interval[1], [], params.genomicsdb ? "${params.genomicsdb}/genomicsdb.${interval[1].baseName}" : [] ] }
+
+    //
+    // MODULE: GATK GenomicsDBImport
+    //
+    GATK4_GENOMICSDBIMPORT (
+        ch_genomicsdbimport_input,
+        false,                            // not getting interval list
+        params.genomicsdb ? true : false, // whether updating existing workspace
+        false                             // not providing sample name map file
+    )
+    ch_versions = ch_versions.mix(GATK4_GENOMICSDBIMPORT.out.versions)
 
     //
     // Collate and save software versions
