@@ -3,8 +3,10 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { GATK4_GENOMICSDBIMPORT } from '../modules/nf-core/gatk4/genomicsdbimport/main'
 include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
+include { GATK4_GENOMICSDBIMPORT } from '../modules/nf-core/gatk4/genomicsdbimport/main'
+include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES } from '../modules/local/bcftools/makebeds/main'
+include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_BCFTOOLS  } from '../modules/local/bcftools/makebeds/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -59,6 +61,26 @@ workflow ZFVARMERGE {
         false                             // not providing sample name map file
     )
     ch_versions = ch_versions.mix(GATK4_GENOMICSDBIMPORT.out.versions)
+
+    //
+    // MODULE: Make freebayes BED files
+    //
+    BCFTOOLS_MAKEBEDS_FREEBAYES (
+        ch_freebayes_vcf,
+        ch_fasta,
+        ch_fasta_fai
+    )
+    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
+
+    //
+    // MODULE: Make BCFtools BED files
+    //
+    BCFTOOLS_MAKEBEDS_BCFTOOLS (
+        ch_bcftools_vcf,
+        ch_fasta,
+        ch_fasta_fai
+    )
+    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
 
     //
     // Collate and save software versions
