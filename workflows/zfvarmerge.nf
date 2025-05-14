@@ -55,7 +55,6 @@ workflow ZFVARMERGE {
         ch_genomicsdbimport_input,
         ch_gatk_vcfs,
         ch_gatk_tbis,
-        false,                            // not getting interval list
         params.genomicsdb ? true : false, // whether updating existing workspace
         false                             // not providing sample name map file
     )

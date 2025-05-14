@@ -47,11 +47,6 @@ input:
         type: list
         description: list of tbi files that match with the input vcf files
         pattern: "*.vcf.gz_tbi"
-  - - run_intlist:
-        type: boolean
-        description: Specify whether to run get interval list mode, this option cannot
-          be specified at the same time as run_updatewspace.
-        pattern: "true/false"
   - - run_updatewspace:
         type: boolean
         description: Specify whether to run update genomicsdb mode, this option takes
@@ -88,22 +83,6 @@ output:
             workspace, this is only output for update mode, and should be the same path
             as the input wspace.
           pattern: "same/path/as/wspace"
-  - intervallist:
-      - meta:
-          type: file
-          description: File containing the intervals used to generate the genomicsdb,
-            only created by get intervals mode.
-          pattern: "*.interval_list"
-      - "*.interval_list":
-          type: file
-          description: File containing the intervals used to generate the genomicsdb,
-            only created by get intervals mode.
-          pattern: "*.interval_list"
-      - list:
-          type: file
-          description: File containing the intervals used to generate the genomicsdb,
-            only created by get intervals mode.
-          pattern: "*.interval_list"
   - versions:
       - versions.yml:
           type: file
