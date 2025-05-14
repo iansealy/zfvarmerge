@@ -47,11 +47,6 @@ input:
         type: list
         description: list of tbi files that match with the input vcf files
         pattern: "*.vcf.gz_tbi"
-  - - run_updatewspace:
-        type: boolean
-        description: Specify whether to run update genomicsdb mode, this option takes
-          priority over run_intlist.
-        pattern: "true/false"
   - - input_map:
         type: boolean
         description: Specify whether the vcf input is providing a list of vcf file(s)
@@ -62,26 +57,13 @@ output:
   - genomicsdb:
       - meta:
           type: directory
-          description: Directory containing the files that compose the genomicsdb workspace,
-            this is only output for create mode, as update changes an existing db
-          pattern: "*/$prefix"
-      - $prefix:
-          type: directory
-          description: Directory containing the files that compose the genomicsdb workspace,
-            this is only output for create mode, as update changes an existing db
-          pattern: "*/$prefix"
-  - updatedb:
-      - meta:
-          type: directory
-          description: Directory containing the files that compose the updated genomicsdb
-            workspace, this is only output for update mode, and should be the same path
-            as the input wspace.
+          description: Directory containing the files that compose the genomicsdb
+            workspace.
           pattern: "same/path/as/wspace"
-      - $updated_db:
+      - $wspace:
           type: directory
-          description: Directory containing the files that compose the updated genomicsdb
-            workspace, this is only output for update mode, and should be the same path
-            as the input wspace.
+          description: Directory containing the files that compose the genomicsdb
+            workspace.
           pattern: "same/path/as/wspace"
   - versions:
       - versions.yml:

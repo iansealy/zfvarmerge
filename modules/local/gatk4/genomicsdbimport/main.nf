@@ -11,13 +11,11 @@ process GATK4_GENOMICSDBIMPORT {
     tuple val(meta), path(interval_file), val(interval_value), path(wspace)
     path  vcf
     path  tbi
-    val   run_updatewspace
     val   input_map
 
     output:
-    tuple val(meta), path("$prefix")    , optional:true, emit: genomicsdb
-    tuple val(meta), path("$updated_db"), optional:true, emit: updatedb
-    path "versions.yml"                                , emit: versions
+    tuple val(meta), path("$wspace"), emit: genomicsdb
+    path "versions.yml"             , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,13 +29,13 @@ process GATK4_GENOMICSDBIMPORT {
 
     genomicsdb_command = "--genomicsdb-workspace-path ${prefix}"
     interval_command = interval_file ? "--intervals ${interval_file}" : "--intervals ${interval_value}"
-    updated_db = ""
+    extra_command = "cp -r ${prefix} ${wspace.resolveSymLink()}"
 
     // settings changed for running update gendb mode. input_command same as default, update_db forces module to emit the updated gendb
-    if (run_updatewspace) {
+    if (new File(wspace.resolveSymLink().toString()).exists()) {
         genomicsdb_command = "--genomicsdb-update-workspace-path ${wspace}"
         interval_command = ''
-        updated_db = "${wspace}"
+        extra_command = ""
     }
 
     def avail_mem = 3072
@@ -54,6 +52,7 @@ process GATK4_GENOMICSDBIMPORT {
         $interval_command \\
         --tmp-dir . \\
         $args
+    $extra_command
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

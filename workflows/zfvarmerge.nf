@@ -46,7 +46,7 @@ workflow ZFVARMERGE {
     ch_gatk_vcfs = ch_gatk_vcf.map { meta, vcf -> vcf }.collect()
     ch_gatk_tbis = BCFTOOLS_INDEX.out.tbi.map { meta, tbi -> tbi }.collect()
     ch_genomicsdbimport_input = ch_genome_bed
-        .map{ interval -> [ [ id:'genomicsdb', order:interval[1].baseName ], interval[1], [], params.genomicsdb ? "${params.genomicsdb}/genomicsdb.${interval[1].baseName}" : [] ] }
+        .map{ interval -> [ [ id:'genomicsdb', order:interval[1].baseName ], interval[1], [], "${params.genomicsdb}/genomicsdb.${interval[1].baseName}" ] }
 
     //
     // MODULE: GATK GenomicsDBImport
@@ -55,8 +55,7 @@ workflow ZFVARMERGE {
         ch_genomicsdbimport_input,
         ch_gatk_vcfs,
         ch_gatk_tbis,
-        params.genomicsdb ? true : false, // whether updating existing workspace
-        false                             // not providing sample name map file
+        false // not providing sample name map file
     )
     ch_versions = ch_versions.mix(GATK4_GENOMICSDBIMPORT.out.versions)
 

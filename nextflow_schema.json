@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir", "fasta"],
+            "required": ["input", "outdir", "fasta", "genomicsdb"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -84,7 +84,7 @@
                     "format": "directory-path",
                     "exists": true,
                     "description": "Directory containing GenomicsDB directories.",
-                    "help_text": "If this parameter is not specified then a new GenomicsDB will be created in the output directory.",
+                    "help_text": "This parameter is *mandatory*, but can point to an empty directory.",
                     "fa_icon": "fas fa-folder-open"
                 }
             }
