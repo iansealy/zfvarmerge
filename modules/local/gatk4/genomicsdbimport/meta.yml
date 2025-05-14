@@ -23,15 +23,6 @@ input:
         description: |
           Groovy Map containing sample information
           e.g. [ id:'test']
-    - vcf:
-        type: list
-        description: either a list of vcf files to be used to create or update a genomicsdb,
-          or a file that contains a map to vcf files to be used.
-        pattern: "*.vcf.gz"
-    - tbi:
-        type: list
-        description: list of tbi files that match with the input vcf files
-        pattern: "*.vcf.gz_tbi"
     - interval_file:
         type: file
         description: file containing the intervals to be used when creating the genomicsdb
@@ -47,6 +38,15 @@ input:
           get intervals mode. This WILL NOT specify name of a new genomicsdb in create
           db mode.
         pattern: "/path/to/existing/gendb"
+  - - vcf:
+        type: list
+        description: either a list of vcf files to be used to create or update a genomicsdb,
+          or a file that contains a map to vcf files to be used.
+        pattern: "*.vcf.gz"
+  - - tbi:
+        type: list
+        description: list of tbi files that match with the input vcf files
+        pattern: "*.vcf.gz_tbi"
   - - run_intlist:
         type: boolean
         description: Specify whether to run get interval list mode, this option cannot
