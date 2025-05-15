@@ -6,6 +6,7 @@
 include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_GVCF           } from '../modules/nf-core/bcftools/index/main'
 include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_VCF            } from '../modules/nf-core/bcftools/index/main'
 include { BCFTOOLS_CONCAT        } from '../modules/nf-core/bcftools/concat/main'
+include { BCFTOOLS_STATS         } from '../modules/nf-core/bcftools/stats/main'
 include { GATK4_GENOMICSDBIMPORT } from '../modules/local/gatk4/genomicsdbimport/main'
 include { GATK4_GENOTYPEGVCFS    } from '../modules/nf-core/gatk4/genotypegvcfs/main'
 include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES } from '../modules/local/bcftools/makebeds/main'
@@ -95,6 +96,22 @@ workflow ZFVARMERGE {
         BCFTOOLS_CONCAT.out.vcf
     )
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX_VCF.out.versions)
+
+    //
+    // MODULE: BCFtools stats
+    //
+    ch_vcf_tbi = BCFTOOLS_CONCAT.out.vcf.join(BCFTOOLS_INDEX_VCF.out.tbi, failOnDuplicate: true, failOnMismatch: true)
+        .map{ meta, vcf, tbi -> [meta, vcf, tbi] }
+    BCFTOOLS_STATS (
+        ch_vcf_tbi,
+        [[], []], // no need for regions file
+        [[], []], // no need for targets file
+        [[], []], // no need for samples file
+        [[], []], // no need for exons file
+        [[], []]  // no need for fasta file
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(BCFTOOLS_STATS.out.stats.collect{it[1]})
+    ch_versions = ch_versions.mix(BCFTOOLS_STATS.out.versions)
 
     //
     // MODULE: Make freebayes BED files
