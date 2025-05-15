@@ -3,7 +3,8 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_GVCF           } from '../modules/nf-core/bcftools/index/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_VCF            } from '../modules/nf-core/bcftools/index/main'
 include { BCFTOOLS_CONCAT        } from '../modules/nf-core/bcftools/concat/main'
 include { GATK4_GENOMICSDBIMPORT } from '../modules/local/gatk4/genomicsdbimport/main'
 include { GATK4_GENOTYPEGVCFS    } from '../modules/nf-core/gatk4/genotypegvcfs/main'
@@ -38,18 +39,18 @@ workflow ZFVARMERGE {
     ch_multiqc_files = Channel.empty()
 
     //
-    // MODULE: BCFtools index
+    // MODULE: BCFtools index gVCFs
     //
-    BCFTOOLS_INDEX (
+    BCFTOOLS_INDEX_GVCF (
         ch_gatk_vcf
     )
-    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
+    ch_versions = ch_versions.mix(BCFTOOLS_INDEX_GVCF.out.versions)
 
     //
     // MODULE: GATK GenomicsDBImport
     //
     ch_gatk_vcfs = ch_gatk_vcf.map { meta, vcf -> vcf }.collect()
-    ch_gatk_tbis = BCFTOOLS_INDEX.out.tbi.map { meta, tbi -> tbi }.collect()
+    ch_gatk_tbis = BCFTOOLS_INDEX_GVCF.out.tbi.map { meta, tbi -> tbi }.collect()
     ch_genomicsdbimport_input = ch_genome_bed
         .map{ interval -> [ [ id:'genomicsdb', order:interval[1].baseName ], interval[1], [], "${params.genomicsdb}/genomicsdb.${interval[1].baseName}" ] }
     GATK4_GENOMICSDBIMPORT (
@@ -88,6 +89,14 @@ workflow ZFVARMERGE {
     ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions)
 
     //
+    // MODULE: BCFtools index VCF
+    //
+    BCFTOOLS_INDEX_VCF (
+        BCFTOOLS_CONCAT.out.vcf
+    )
+    ch_versions = ch_versions.mix(BCFTOOLS_INDEX_VCF.out.versions)
+
+    //
     // MODULE: Make freebayes BED files
     //
     BCFTOOLS_MAKEBEDS_FREEBAYES (
@@ -95,7 +104,7 @@ workflow ZFVARMERGE {
         ch_fasta,
         ch_fasta_fai
     )
-    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
+    ch_versions = ch_versions.mix(BCFTOOLS_MAKEBEDS_FREEBAYES.out.versions)
 
     //
     // MODULE: Make BCFtools BED files
@@ -105,7 +114,7 @@ workflow ZFVARMERGE {
         ch_fasta,
         ch_fasta_fai
     )
-    ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
+    ch_versions = ch_versions.mix(BCFTOOLS_MAKEBEDS_BCFTOOLS.out.versions)
 
     //
     // Collate and save software versions
