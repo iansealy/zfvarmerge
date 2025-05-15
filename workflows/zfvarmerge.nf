@@ -44,14 +44,13 @@ workflow ZFVARMERGE {
     )
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions)
 
+    //
+    // MODULE: GATK GenomicsDBImport
+    //
     ch_gatk_vcfs = ch_gatk_vcf.map { meta, vcf -> vcf }.collect()
     ch_gatk_tbis = BCFTOOLS_INDEX.out.tbi.map { meta, tbi -> tbi }.collect()
     ch_genomicsdbimport_input = ch_genome_bed
         .map{ interval -> [ [ id:'genomicsdb', order:interval[1].baseName ], interval[1], [], "${params.genomicsdb}/genomicsdb.${interval[1].baseName}" ] }
-
-    //
-    // MODULE: GATK GenomicsDBImport
-    //
     GATK4_GENOMICSDBIMPORT (
         ch_genomicsdbimport_input,
         ch_gatk_vcfs,
