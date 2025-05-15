@@ -27,12 +27,12 @@ process BCFTOOLS_MAKEBEDS {
     bcftools +fill-tags $vcf -- -t AC | \\
     bcftools view -V indels --min-ac=1 - | \\
     bcftools norm -c x -f $fasta - | \\
-    bcftools query -f '%CHROM\t%POS0\t%END\n' - > ${prefix}.snps.bed
+    bcftools query -f '%CHROM\t%POS0\t%END\\n' - > ${prefix}.snps.bed
 
     bcftools +fill-tags $vcf -- -t AC | \\
     bcftools view -v indels - | \\
     bcftools norm -c x -f $fasta - | \\
-    bcftools query -f '%CHROM\t%POS0\t%END\n' - > ${prefix}.indels.bed
+    bcftools query -f '%CHROM\t%POS0\t%END\\n' - > ${prefix}.indels.bed
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
