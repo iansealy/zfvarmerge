@@ -5,6 +5,7 @@
 */
 include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
 include { GATK4_GENOMICSDBIMPORT } from '../modules/local/gatk4/genomicsdbimport/main'
+include { GATK4_GENOTYPEGVCFS    } from '../modules/nf-core/gatk4/genotypegvcfs/main'
 include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES } from '../modules/local/bcftools/makebeds/main'
 include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_BCFTOOLS  } from '../modules/local/bcftools/makebeds/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
@@ -58,6 +59,21 @@ workflow ZFVARMERGE {
         false // not providing sample name map file
     )
     ch_versions = ch_versions.mix(GATK4_GENOMICSDBIMPORT.out.versions)
+
+    //
+    // MODULE: GATK GenotypeGVCFs
+    //
+    ch_genomicsdb = GATK4_GENOMICSDBIMPORT.out.genomicsdb
+        .map{ meta, genomicsdb -> [ meta, genomicsdb, [], [], [] ] }
+    GATK4_GENOTYPEGVCFS (
+        ch_genomicsdb,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_fasta_dict,
+        [[], []], // not providing dbSNP VCF file
+        [[], []]  // not providing dbSNP VCF index file
+    )
+    ch_versions = ch_versions.mix(GATK4_GENOTYPEGVCFS.out.versions)
 
     //
     // MODULE: Make freebayes BED files
