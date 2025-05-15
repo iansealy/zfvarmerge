@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { BCFTOOLS_INDEX         } from '../modules/nf-core/bcftools/index/main'
+include { BCFTOOLS_CONCAT        } from '../modules/nf-core/bcftools/concat/main'
 include { GATK4_GENOMICSDBIMPORT } from '../modules/local/gatk4/genomicsdbimport/main'
 include { GATK4_GENOTYPEGVCFS    } from '../modules/nf-core/gatk4/genotypegvcfs/main'
 include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES } from '../modules/local/bcftools/makebeds/main'
@@ -73,6 +74,18 @@ workflow ZFVARMERGE {
         [[], []]  // not providing dbSNP VCF index file
     )
     ch_versions = ch_versions.mix(GATK4_GENOTYPEGVCFS.out.versions)
+
+    //
+    // MODULE: BCFtools concat
+    //
+    ch_vcfs_tbis = GATK4_GENOTYPEGVCFS.out.vcf.map{ meta, vcf -> [meta, vcf, meta.order] }
+        .map { it[0].remove("order"); it }
+        .groupTuple()
+        .map{ meta, vcfs, order -> [[id:"gatk"], order.withIndex().sort().collect { vcfs[it[1]] }, []] }
+    BCFTOOLS_CONCAT (
+        ch_vcfs_tbis
+    )
+    ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions)
 
     //
     // MODULE: Make freebayes BED files
