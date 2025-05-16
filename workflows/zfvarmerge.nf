@@ -134,9 +134,12 @@ workflow ZFVARMERGE {
     //
     // MODULE: Sort freebayes SNP BED files
     //
-    ch_freebayes_snp_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.snpbed
-        .map{ bed -> [ [id:"freebayes.snps.unmerged"], bed ] }
-        .groupTuple()
+    ch_freebayes_snp_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.snpbed.collect()
+    if (params.freebayes_snp_bed) {
+        ch_freebayes_snp_beds = ch_freebayes_snp_beds.mix(Channel.value(file(params.freebayes_snp_bed)))
+    }
+    ch_freebayes_snp_beds = ch_freebayes_snp_beds.collect()
+        .map{ beds -> [ [id:"freebayes.snps.unmerged"], beds ] }
     GNU_SORT_FREEBAYES_SNPS (
         ch_freebayes_snp_beds
     )
@@ -155,9 +158,12 @@ workflow ZFVARMERGE {
     //
     // MODULE: Sort freebayes indel BED files
     //
-    ch_freebayes_indel_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.indelbed
-        .map{ bed -> [ [id:"freebayes.indels.unmerged"], bed ] }
-        .groupTuple()
+    ch_freebayes_indel_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.indelbed.collect()
+    if (params.freebayes_indel_bed) {
+        ch_freebayes_indel_beds = ch_freebayes_indel_beds.mix(Channel.value(file(params.freebayes_indel_bed)))
+    }
+    ch_freebayes_indel_beds = ch_freebayes_indel_beds.collect()
+        .map{ beds -> [ [id:"freebayes.indels.unmerged"], beds ] }
     GNU_SORT_FREEBAYES_INDELS (
         ch_freebayes_indel_beds
     )
@@ -186,9 +192,12 @@ workflow ZFVARMERGE {
     //
     // MODULE: Sort BCFtools SNP BED files
     //
-    ch_bcftools_snp_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.snpbed
-        .map{ bed -> [ [id:"bcftools.snps.unmerged"], bed ] }
-        .groupTuple()
+    ch_bcftools_snp_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.snpbed.collect()
+    if (params.bcftools_snp_bed) {
+        ch_bcftools_snp_beds = ch_bcftools_snp_beds.mix(Channel.value(file(params.bcftools_snp_bed)))
+    }
+    ch_bcftools_snp_beds = ch_bcftools_snp_beds.collect()
+        .map{ beds -> [ [id:"bcftools.snps.unmerged"], beds ] }
     GNU_SORT_BCFTOOLS_SNPS (
         ch_bcftools_snp_beds
     )
@@ -207,9 +216,12 @@ workflow ZFVARMERGE {
     //
     // MODULE: Sort BCFtools indel BED files
     //
-    ch_bcftools_indel_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.indelbed
-        .map{ bed -> [ [id:"bcftools.indels.unmerged"], bed ] }
-        .groupTuple()
+    ch_bcftools_indel_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.indelbed.collect()
+    if (params.bcftools_indel_bed) {
+        ch_bcftools_indel_beds = ch_bcftools_indel_beds.mix(Channel.value(file(params.bcftools_indel_bed)))
+    }
+    ch_bcftools_indel_beds = ch_bcftools_indel_beds.collect()
+        .map{ beds -> [ [id:"bcftools.indels.unmerged"], beds ] }
     GNU_SORT_BCFTOOLS_INDELS (
         ch_bcftools_indel_beds
     )

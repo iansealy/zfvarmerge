@@ -86,6 +86,46 @@
                     "description": "Directory containing GenomicsDB directories.",
                     "help_text": "This parameter is *mandatory*, but can point to an empty directory.",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "freebayes_snp_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.bed$",
+                    "description": "Path to BED file of freebayes SNPs.",
+                    "help_text": "This parameter isn't needed for the first pipeline run, but is needed for subsequent runs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "freebayes_indel_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.bed$",
+                    "description": "Path to BED file of freebayes indels.",
+                    "help_text": "This parameter isn't needed for the first pipeline run, but is needed for subsequent runs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "bcftools_snp_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.bed$",
+                    "description": "Path to BED file of BCFtools SNPs.",
+                    "help_text": "This parameter isn't needed for the first pipeline run, but is needed for subsequent runs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "bcftools_indel_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.bed$",
+                    "description": "Path to BED file of BCFtools indels.",
+                    "help_text": "This parameter isn't needed for the first pipeline run, but is needed for subsequent runs.",
+                    "fa_icon": "far fa-file-code"
                 }
             }
         },
