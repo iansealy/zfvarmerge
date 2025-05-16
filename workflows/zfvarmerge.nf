@@ -3,14 +3,22 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_GVCF           } from '../modules/nf-core/bcftools/index/main'
-include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_VCF            } from '../modules/nf-core/bcftools/index/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_GVCF            } from '../modules/nf-core/bcftools/index/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_VCF             } from '../modules/nf-core/bcftools/index/main'
 include { BCFTOOLS_CONCAT        } from '../modules/nf-core/bcftools/concat/main'
 include { BCFTOOLS_STATS         } from '../modules/nf-core/bcftools/stats/main'
 include { GATK4_GENOMICSDBIMPORT } from '../modules/local/gatk4/genomicsdbimport/main'
 include { GATK4_GENOTYPEGVCFS    } from '../modules/nf-core/gatk4/genotypegvcfs/main'
-include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES } from '../modules/local/bcftools/makebeds/main'
-include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_BCFTOOLS  } from '../modules/local/bcftools/makebeds/main'
+include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_FREEBAYES  } from '../modules/local/bcftools/makebeds/main'
+include { BCFTOOLS_MAKEBEDS as BCFTOOLS_MAKEBEDS_BCFTOOLS   } from '../modules/local/bcftools/makebeds/main'
+include { GNU_SORT as GNU_SORT_FREEBAYES_SNPS               } from '../modules/nf-core/gnu/sort/main'
+include { GNU_SORT as GNU_SORT_FREEBAYES_INDELS             } from '../modules/nf-core/gnu/sort/main'
+include { GNU_SORT as GNU_SORT_BCFTOOLS_SNPS                } from '../modules/nf-core/gnu/sort/main'
+include { GNU_SORT as GNU_SORT_BCFTOOLS_INDELS              } from '../modules/nf-core/gnu/sort/main'
+include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_FREEBAYES_SNPS   } from '../modules/nf-core/bedtools/merge/main'
+include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_FREEBAYES_INDELS } from '../modules/nf-core/bedtools/merge/main'
+include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_BCFTOOLS_SNPS    } from '../modules/nf-core/bedtools/merge/main'
+include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_BCFTOOLS_INDELS  } from '../modules/nf-core/bedtools/merge/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -124,6 +132,48 @@ workflow ZFVARMERGE {
     ch_versions = ch_versions.mix(BCFTOOLS_MAKEBEDS_FREEBAYES.out.versions)
 
     //
+    // MODULE: Sort freebayes SNP BED files
+    //
+    ch_freebayes_snp_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.snpbed
+        .map{ vcf -> [ [id:"freebayes.snps.unmerged"], vcf ] }
+        .groupTuple()
+    GNU_SORT_FREEBAYES_SNPS (
+        ch_freebayes_snp_beds
+    )
+    ch_versions = ch_versions.mix(GNU_SORT_FREEBAYES_SNPS.out.versions)
+
+    //
+    // MODULE: Merge freebayes SNP BED files
+    //
+    ch_freebayes_snp_bed = GNU_SORT_FREEBAYES_SNPS.out.sorted
+        .map{ meta, vcf -> [ [id:"freebayes.snps"], vcf ] }
+    BEDTOOLS_MERGE_FREEBAYES_SNPS (
+        ch_freebayes_snp_bed
+    )
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_FREEBAYES_SNPS.out.versions)
+
+    //
+    // MODULE: Sort freebayes indel BED files
+    //
+    ch_freebayes_indel_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.indelbed
+        .map{ vcf -> [ [id:"freebayes.indels.unmerged"], vcf ] }
+        .groupTuple()
+    GNU_SORT_FREEBAYES_INDELS (
+        ch_freebayes_indel_beds
+    )
+    ch_versions = ch_versions.mix(GNU_SORT_FREEBAYES_INDELS.out.versions)
+
+    //
+    // MODULE: Merge freebayes indel BED files
+    //
+    ch_freebayes_indel_bed = GNU_SORT_FREEBAYES_INDELS.out.sorted
+        .map{ meta, vcf -> [ [id:"freebayes.indels"], vcf ] }
+    BEDTOOLS_MERGE_FREEBAYES_INDELS (
+        ch_freebayes_indel_bed
+    )
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_FREEBAYES_INDELS.out.versions)
+
+    //
     // MODULE: Make BCFtools BED files
     //
     BCFTOOLS_MAKEBEDS_BCFTOOLS (
@@ -132,6 +182,48 @@ workflow ZFVARMERGE {
         ch_fasta_fai
     )
     ch_versions = ch_versions.mix(BCFTOOLS_MAKEBEDS_BCFTOOLS.out.versions)
+
+    //
+    // MODULE: Sort BCFtools SNP BED files
+    //
+    ch_bcftools_snp_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.snpbed
+        .map{ vcf -> [ [id:"bcftools.snps.unmerged"], vcf ] }
+        .groupTuple()
+    GNU_SORT_BCFTOOLS_SNPS (
+        ch_bcftools_snp_beds
+    )
+    ch_versions = ch_versions.mix(GNU_SORT_BCFTOOLS_SNPS.out.versions)
+
+    //
+    // MODULE: Merge BCFtools SNP BED files
+    //
+    ch_bcftools_snp_bed = GNU_SORT_BCFTOOLS_SNPS.out.sorted
+        .map{ meta, vcf -> [ [id:"bcftools.snps"], vcf ] }
+    BEDTOOLS_MERGE_BCFTOOLS_SNPS (
+        ch_bcftools_snp_bed
+    )
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_BCFTOOLS_SNPS.out.versions)
+
+    //
+    // MODULE: Sort BCFtools indel BED files
+    //
+    ch_bcftools_indel_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.indelbed
+        .map{ vcf -> [ [id:"bcftools.indels.unmerged"], vcf ] }
+        .groupTuple()
+    GNU_SORT_BCFTOOLS_INDELS (
+        ch_bcftools_indel_beds
+    )
+    ch_versions = ch_versions.mix(GNU_SORT_BCFTOOLS_INDELS.out.versions)
+
+    //
+    // MODULE: Merge BCFtools indel BED files
+    //
+    ch_bcftools_indel_bed = GNU_SORT_BCFTOOLS_INDELS.out.sorted
+        .map{ meta, vcf -> [ [id:"bcftools.indels"], vcf ] }
+    BEDTOOLS_MERGE_BCFTOOLS_INDELS (
+        ch_bcftools_indel_bed
+    )
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_BCFTOOLS_INDELS.out.versions)
 
     //
     // Collate and save software versions
