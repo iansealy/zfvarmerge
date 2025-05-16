@@ -135,7 +135,7 @@ workflow ZFVARMERGE {
     // MODULE: Sort freebayes SNP BED files
     //
     ch_freebayes_snp_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.snpbed
-        .map{ vcf -> [ [id:"freebayes.snps.unmerged"], vcf ] }
+        .map{ bed -> [ [id:"freebayes.snps.unmerged"], bed ] }
         .groupTuple()
     GNU_SORT_FREEBAYES_SNPS (
         ch_freebayes_snp_beds
@@ -146,7 +146,7 @@ workflow ZFVARMERGE {
     // MODULE: Merge freebayes SNP BED files
     //
     ch_freebayes_snp_bed = GNU_SORT_FREEBAYES_SNPS.out.sorted
-        .map{ meta, vcf -> [ [id:"freebayes.snps"], vcf ] }
+        .map{ meta, bed -> [ [id:"freebayes.snps"], bed ] }
     BEDTOOLS_MERGE_FREEBAYES_SNPS (
         ch_freebayes_snp_bed
     )
@@ -156,7 +156,7 @@ workflow ZFVARMERGE {
     // MODULE: Sort freebayes indel BED files
     //
     ch_freebayes_indel_beds = BCFTOOLS_MAKEBEDS_FREEBAYES.out.indelbed
-        .map{ vcf -> [ [id:"freebayes.indels.unmerged"], vcf ] }
+        .map{ bed -> [ [id:"freebayes.indels.unmerged"], bed ] }
         .groupTuple()
     GNU_SORT_FREEBAYES_INDELS (
         ch_freebayes_indel_beds
@@ -167,7 +167,7 @@ workflow ZFVARMERGE {
     // MODULE: Merge freebayes indel BED files
     //
     ch_freebayes_indel_bed = GNU_SORT_FREEBAYES_INDELS.out.sorted
-        .map{ meta, vcf -> [ [id:"freebayes.indels"], vcf ] }
+        .map{ meta, bed -> [ [id:"freebayes.indels"], bed ] }
     BEDTOOLS_MERGE_FREEBAYES_INDELS (
         ch_freebayes_indel_bed
     )
@@ -187,7 +187,7 @@ workflow ZFVARMERGE {
     // MODULE: Sort BCFtools SNP BED files
     //
     ch_bcftools_snp_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.snpbed
-        .map{ vcf -> [ [id:"bcftools.snps.unmerged"], vcf ] }
+        .map{ bed -> [ [id:"bcftools.snps.unmerged"], bed ] }
         .groupTuple()
     GNU_SORT_BCFTOOLS_SNPS (
         ch_bcftools_snp_beds
@@ -198,7 +198,7 @@ workflow ZFVARMERGE {
     // MODULE: Merge BCFtools SNP BED files
     //
     ch_bcftools_snp_bed = GNU_SORT_BCFTOOLS_SNPS.out.sorted
-        .map{ meta, vcf -> [ [id:"bcftools.snps"], vcf ] }
+        .map{ meta, bed -> [ [id:"bcftools.snps"], bed ] }
     BEDTOOLS_MERGE_BCFTOOLS_SNPS (
         ch_bcftools_snp_bed
     )
@@ -208,7 +208,7 @@ workflow ZFVARMERGE {
     // MODULE: Sort BCFtools indel BED files
     //
     ch_bcftools_indel_beds = BCFTOOLS_MAKEBEDS_BCFTOOLS.out.indelbed
-        .map{ vcf -> [ [id:"bcftools.indels.unmerged"], vcf ] }
+        .map{ bed -> [ [id:"bcftools.indels.unmerged"], bed ] }
         .groupTuple()
     GNU_SORT_BCFTOOLS_INDELS (
         ch_bcftools_indel_beds
@@ -219,7 +219,7 @@ workflow ZFVARMERGE {
     // MODULE: Merge BCFtools indel BED files
     //
     ch_bcftools_indel_bed = GNU_SORT_BCFTOOLS_INDELS.out.sorted
-        .map{ meta, vcf -> [ [id:"bcftools.indels"], vcf ] }
+        .map{ meta, bed -> [ [id:"bcftools.indels"], bed ] }
     BEDTOOLS_MERGE_BCFTOOLS_INDELS (
         ch_bcftools_indel_bed
     )
